@@ -1,0 +1,90 @@
+<html>
+
+<head>
+    <title>DBPedia data fetcher</title>
+</head>
+
+
+<body>
+
+    <label for="word">Слово: </label>
+    <input id="word" type="text"/>
+    <br/>
+    <label for="lang">Язык: </label>
+    <select id="lang" type="select">
+        <option value="ru">ru</option>
+        <option value="en">en</option>
+        <option value="de">de</option>
+        <option value="fr">fr</option>
+    </select>
+    <br/>
+    <button type="button" onclick="queryDBpedia()">Search</button>
+
+    <br/><br/>
+
+    <div id="img"></div>
+    <textarea id="abstract" cols="80" rows="10"></textarea>
+
+    <script src="http://code.jquery.com/jquery-latest.min.js"
+            type="text/javascript"></script>
+
+    <script>
+
+        sparql_query = [
+            'PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>    ',
+            'PREFIX dbo: <http://dbpedia.org/ontology/>              ',
+            'SELECT ?pic, ?abstract WHERE {                          ',
+            '{                                                       ',
+            '    ?s rdfs:label "{word}"@{lang} .                     ',
+            '    {                                                   ',
+            '        ?s dbo:wikiPageRedirects ?actualResource .      ',
+            '        ?actualResource rdfs:label    ?redirectsTo ;    ',
+            '                        dbo:thumbnail ?pic         ;    ',
+            '                       dbo:abstract  ?abstract          ',
+            '        FILTER(lang(?redirectsTo) = "{lang}")           ',
+            '   }                                                    ',
+            '   UNION                                                ',
+            '   {                                                    ',
+            '        ?s dbo:thumbnail ?pic  ;                        ',
+            '          dbo:abstract  ?abstract                       ',
+            '   }                                                    ',
+            '}                                                       ',
+            'FILTER (lang(?abstract) = "{lang}")                     ',
+            '} LIMIT 1                                               '
+        ].join('\n');
+
+        function queryDBpedia()
+        {
+            word = $("input#word").val()
+            // Transforming the string to make it conforming to the strict case rules
+            // NB: Makes all the letters lower case except the 1st one, so fails for names
+            word = word.substring(0, 1).toUpperCase() +
+                   word.substring(1, word.Length).toLowerCase().replace(/\s/g, '_')
+            lang = $("select#lang").val()
+
+            query = sparql_query.replace("{word}", word)
+            query = query.replace(/{lang}/g, lang)
+
+            $.ajax({
+            type: "GET",
+            url: "http://dbpedia.org/sparql/",
+            data: { "default-graph-uri": "http://dbpedia.org",
+                    "query": query,
+                    "format": "application/sparql-results+xml",
+                    "timeout": 30000,
+                    "debug": "on" },
+            success: function(msg){
+              $("div#img").html('<img src="' + msg.documentElement.getElementsByTagName("results")[0].getElementsByTagName("result")[0].getElementsByTagName("binding")[0].getElementsByTagName("uri")[0].textContent + '"/>');
+              $("textarea#abstract").val(msg.documentElement.getElementsByTagName("results")[0].getElementsByTagName("result")[0].getElementsByTagName("binding")[1].getElementsByTagName("literal")[0].textContent);
+            },
+            error: function(){
+              alert("error")
+            }
+            });
+        }
+
+    </script>
+
+</body>
+
+</html>
