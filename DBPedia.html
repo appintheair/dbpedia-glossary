@@ -1,5 +1,4 @@
 <html>
-
 <head>
     <title>DBPedia data fetcher</title>
 </head>
@@ -74,8 +73,14 @@
                     "timeout": 30000,
                     "debug": "on" },
             success: function(msg){
-              $("div#img").html('<img src="' + msg.documentElement.getElementsByTagName("results")[0].getElementsByTagName("result")[0].getElementsByTagName("binding")[0].getElementsByTagName("uri")[0].textContent + '"/>');
-              $("textarea#abstract").val(msg.documentElement.getElementsByTagName("results")[0].getElementsByTagName("result")[0].getElementsByTagName("binding")[1].getElementsByTagName("literal")[0].textContent);
+              $("div#img").html('<img src="' + msg.documentElement.getElementsByTagName("results")[0].
+                                                                   getElementsByTagName("result")[0].
+                                                                   getElementsByTagName("binding")[0].
+                                                                   getElementsByTagName("uri")[0].textContent + '"/>');
+              $("textarea#abstract").val(msg.documentElement.getElementsByTagName("results")[0].
+                                                             getElementsByTagName("result")[0].
+                                                             getElementsByTagName("binding")[1].
+                                                             getElementsByTagName("literal")[0].textContent);
             },
             error: function(){
               alert("error")
@@ -86,5 +91,4 @@
     </script>
 
 </body>
-
 </html>
