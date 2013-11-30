@@ -58,7 +58,7 @@
             // Transforming the string to make it conforming to the strict case rules
             // NB: Makes all the letters lower case except the 1st one, so fails for names
             word = word.substring(0, 1).toUpperCase() +
-                   word.substring(1, word.Length)
+                   word.substring(1, word.Length).toLowerCase()
             lang = $("select#lang").val()
 
             query = sparql_query.replace("{word}", word)
