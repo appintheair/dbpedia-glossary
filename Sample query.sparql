@@ -4,7 +4,12 @@ SELECT ?pic, ?abstract WHERE {
 { 
     ?s rdfs:label "Bob Marly"@en .
     {
-        ?s dbo:wikiPageRedirects ?actualResource .
+        ?s dbo:thumbnail ?pic  ;
+           dbo:abstract  ?abstract
+    }
+    UNION
+    {
+        ?s dbo:wikiPageDisambiguates ?actualResource .
         ?actualResource rdfs:label    ?redirectsTo ; 
                         dbo:thumbnail ?pic         ;
                         dbo:abstract  ?abstract
@@ -12,9 +17,12 @@ SELECT ?pic, ?abstract WHERE {
     }
     UNION
     {
-        ?s dbo:thumbnail ?pic  ;
-           dbo:abstract  ?abstract
-    } 
+        ?s dbo:wikiPageRedirects ?actualResource .
+        ?actualResource rdfs:label    ?redirectsTo ; 
+                        dbo:thumbnail ?pic         ;
+                        dbo:abstract  ?abstract
+        FILTER(lang(?redirectsTo) = "en")
+    }
 }
 FILTER (lang(?abstract) = "en")
 } LIMIT 1
