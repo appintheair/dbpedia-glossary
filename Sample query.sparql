@@ -1,28 +1,29 @@
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX dbo: <http://dbpedia.org/ontology/>
-SELECT ?pic, ?abstract WHERE {
+SELECT ?label, ?pic, ?abstract WHERE {
 { 
     ?s rdfs:label "Bob Marly"@en .
     {
-        ?s dbo:thumbnail ?pic  ;
+        ?s rdfs:label    ?label    ;
+           dbo:thumbnail ?pic      ;
            dbo:abstract  ?abstract
     }
     UNION
     {
         ?s dbo:wikiPageDisambiguates ?actualResource .
-        ?actualResource rdfs:label    ?redirectsTo ; 
-                        dbo:thumbnail ?pic         ;
+        ?actualResource rdfs:label    ?label     ; 
+                        dbo:thumbnail ?pic       ;
                         dbo:abstract  ?abstract
-        FILTER(lang(?redirectsTo) = "en")
+        FILTER(lang(?label) = "en")
     }
     UNION
     {
         ?s dbo:wikiPageRedirects ?actualResource .
-        ?actualResource rdfs:label    ?redirectsTo ; 
-                        dbo:thumbnail ?pic         ;
+        ?actualResource rdfs:label    ?label     ; 
+                        dbo:thumbnail ?pic       ;
                         dbo:abstract  ?abstract
-        FILTER(lang(?redirectsTo) = "en")
+        FILTER(lang(?label) = "en")
     }
 }
 FILTER (lang(?abstract) = "en")
-} LIMIT 1
+}

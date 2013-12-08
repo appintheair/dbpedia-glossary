@@ -31,40 +31,52 @@
     sparql_query = [
         'PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>    ',
         'PREFIX dbo: <http://dbpedia.org/ontology/>              ',
-        'SELECT ?pic, ?abstract WHERE {                          ',
+        'SELECT ?label, ?pic, ?abstract WHERE {                  ',
         '{                                                       ',
         '    ?s rdfs:label "{word}"@{lang} .                     ',
         '    {                                                   ',
-        '        ?s dbo:thumbnail ?pic  ;                        ',
+        '        ?s rdfs:label    ?label     ;                   ',
+        '           dbo:thumbnail ?pic       ;                   ',
         '           dbo:abstract  ?abstract                      ',
+        '        FILTER(lang(?label) = "{lang}")                 ',
         '    }                                                   ',
         '    UNION                                               ',
         '    {                                                   ',
         '        ?s dbo:wikiPageDisambiguates ?actualResource .  ',
-        '        ?actualResource rdfs:label    ?redirectsTo ;    ',
-        '                        dbo:thumbnail ?pic         ;    ',
+        '        ?actualResource rdfs:label    ?label     ;      ',
+        '                        dbo:thumbnail ?pic       ;      ',
         '                        dbo:abstract  ?abstract         ',
-        '        FILTER(lang(?redirectsTo) = "{lang}")           ',
+        '        FILTER(lang(?label) = "{lang}")                 ',
         '    }                                                   ',
         '    UNION                                               ',
         '    {                                                   ',
         '        ?s dbo:wikiPageRedirects ?actualResource .      ',
-        '        ?actualResource rdfs:label    ?redirectsTo ;    ',
-        '                        dbo:thumbnail ?pic         ;    ',
+        '        ?actualResource rdfs:label    ?label     ;      ',
+        '                        dbo:thumbnail ?pic       ;      ',
         '                        dbo:abstract  ?abstract         ',
-        '        FILTER(lang(?redirectsTo) = "{lang}")           ',
+        '        FILTER(lang(?label) = "{lang}")                 ',
         '    }                                                   ',
         '}                                                       ',
         'FILTER (lang(?abstract) = "{lang}")                     ',
-        '} LIMIT 1                                               '
+        '} LIMIT 10                                              '
     ].join('\n');
 
     function showData(msg) {
         console.log(msg);
-        if (msg.results.bindings.length > 0) {
-            $("div#img").html("<img src ='" + msg.results.bindings[0].pic.value + "'/>");
-            $("textarea#abstract").val(msg.results.bindings[0].abstract.value);
-        } else {
+        img_src = '';
+        description = '';
+        word = $("input#word").val().toLowerCase();
+        for (var i = 0; i < msg.results.bindings.length; i++) {
+            label = msg.results.bindings[i].label.value.toLowerCase();
+            if (label.indexOf(word) !== -1) {
+                description = msg.results.bindings[i].abstract.value;
+                img_src = msg.results.bindings[i].pic.value;
+                break;
+            }
+        }
+        $("textarea#abstract").val(description);
+        $("div#img").html("<img src ='" + img_src + "'/>");
+        if (description == "") {
             console.error("no result");
         }
     }
