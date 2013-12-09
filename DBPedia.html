@@ -63,21 +63,22 @@
 
     function showData(msg) {
         console.log(msg);
-        img_src = '';
-        description = '';
+        img_srcs = [];
+        descriptions = [];
         word = $("input#word").val().toLowerCase();
         for (var i = 0; i < msg.results.bindings.length; i++) {
             label = msg.results.bindings[i].label.value.toLowerCase();
             if (label.indexOf(word) !== -1) {
-                description = msg.results.bindings[i].abstract.value;
-                img_src = msg.results.bindings[i].pic.value;
-                break;
+                descriptions.push(msg.results.bindings[i].abstract.value);
+                img_srcs.push(msg.results.bindings[i].pic.value);
             }
         }
-        $("textarea#abstract").val(description);
-        $("div#img").html("<img src ='" + img_src + "'/>");
-        if (description == "") {
+        if (descriptions.length == 0) {
             console.error("no result");
+        } else {
+            k = Math.floor(Math.random()*descriptions.length)
+            $("textarea#abstract").val(descriptions[k]);
+            $("div#img").html("<img src ='" + img_srcs[k] + "'/>");
         }
     }
 
