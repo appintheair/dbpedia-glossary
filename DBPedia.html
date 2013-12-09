@@ -63,34 +63,34 @@
 
     function showData(msg) {
         console.log(msg);
-        img_srcs = [];
-        descriptions = [];
-        word = $("input#word").val().toLowerCase();
+        var imgSrcs = [],
+            descriptions = [],
+            word = $("input#word").val().toLowerCase();
         for (var i = 0; i < msg.results.bindings.length; i++) {
-            label = msg.results.bindings[i].label.value.toLowerCase();
+            var label = msg.results.bindings[i].label.value.toLowerCase();
             if (label.indexOf(word) !== -1) {
                 descriptions.push(msg.results.bindings[i].abstract.value);
-                img_srcs.push(msg.results.bindings[i].pic.value);
+                imgSrcs.push(msg.results.bindings[i].pic.value);
             }
         }
-        if (descriptions.length == 0) {
-            console.error("no result");
+        if (descriptions.length > 0) {
+            var r = Math.floor(Math.random() * descriptions.length);
+            $("textarea#abstract").val(descriptions[r]);
+            $("div#img").html("<img src ='" + imgSrcs[r] + "'/>");
         } else {
-            k = Math.floor(Math.random()*descriptions.length)
-            $("textarea#abstract").val(descriptions[k]);
-            $("div#img").html("<img src ='" + img_srcs[k] + "'/>");
+            console.error("no result");
         }
     }
 
     function queryDBpedia() {
-        word = $("input#word").val();
+        var word = $("input#word").val();
         // Transforming the string to make it conforming to the strict case rules
         // NB: Makes all the letters lower case except the 1st one, so fails for names
         word = word.substring(0, 1).toUpperCase() +
                 word.substring(1, word.Length).toLowerCase();
-        lang = $("select#lang").val();
+        var lang = $("select#lang").val();
 
-        query = sparql_query.replace("{word}", word);
+        var query = sparql_query.replace("{word}", word);
         query = query.replace(/{lang}/g, lang);
 
         $.ajax({
